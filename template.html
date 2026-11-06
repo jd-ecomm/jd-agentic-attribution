@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JD Agentic Traffic</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@font-face{font-family:'FF Sans';src:url('fonts/ForeverForwardSans-Headline.woff2') format('woff2');font-display:swap}
+:root{--y:#FFDE14;--y2:#EFFF04;--bg:#000;--s1:#121212;--s2:#1B1B1B;--s3:#242424;--l1:#2E2E2E;--l2:#3D3D3D;--fg:#FFF;--fg2:#CCC;--fg3:#8A8B8C;--teal:#43D5B0;--grey:#A7A8A9;--red:#FF5A4F}
+:root{color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:'Inter Tight',system-ui,sans-serif;font-size:14px;-webkit-font-smoothing:antialiased}
+.disp{font-family:'FF Sans','Arial Narrow',sans-serif;text-transform:uppercase;font-weight:400;line-height:.85;letter-spacing:-.02em}
+.hero{background:var(--y);color:#000;position:relative;padding:28px 24px 22px;overflow:hidden}
+.hero .k{font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}
+.hero h1{font-size:72px;margin:10px 0 0}
+.hero h1 span{display:block;margin-left:10px}
+.hero .sub{font-size:13px;font-weight:600;margin-top:14px;max-width:760px}
+.hero .rd{position:absolute;right:24px;top:50%;transform:translateY(-50%);width:96px;color:#000}
+.hero .div{position:absolute;right:150px;top:-20px;bottom:-20px;width:2px;background:#000;transform:skewX(-10deg)}
+.wrap{max-width:1320px;margin:0 auto;padding:0 24px 60px}
+.bar{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--l1);padding:12px 0;display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}
+.grp{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.lab{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3);margin-right:2px}
+.pill{border:1px solid var(--l2);background:var(--s2);color:var(--fg2);border-radius:999px;padding:7px 12px;font:600 11.5px 'Inter Tight';text-transform:uppercase;letter-spacing:.04em;cursor:pointer}
+.pill.on{background:var(--y);color:#000;border-color:var(--y)}
+select.pill{appearance:none;padding-right:26px;background-image:linear-gradient(45deg,transparent 50%,var(--fg3) 50%),linear-gradient(135deg,var(--fg3) 50%,transparent 50%);background-position:calc(100% - 14px) 50%,calc(100% - 9px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 6px}
+section{display:none}section.on{display:block}
+h2{font-size:34px;margin:28px 0 6px}
+.note{color:var(--fg3);font-size:12.5px;margin:0 0 14px;max-width:900px;line-height:1.45}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--s1);border-radius:12px;padding:14px 16px 12px;border:1px solid var(--l1)}
+.kpi .l{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fg3)}
+.kpi .v{font-size:48px;margin:10px 0 10px;letter-spacing:-.01em}
+.cmp{display:grid;grid-template-columns:1fr auto;gap:3px 8px;font-size:11.5px;color:var(--fg3)}
+.cmp b{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
+.up{color:var(--teal)}.dn{color:var(--grey)}.flat{color:var(--fg3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.panel{background:var(--s1);border:1px solid var(--l1);border-radius:14px;padding:16px;min-width:0}
+.panel h3{font-size:22px;margin:0 0 4px}
+.panel .sub{color:var(--fg3);font-size:12px;margin-bottom:10px}
+.ch{position:relative;height:300px}.ch.big{height:420px}.stackp{display:grid;gap:12px}
+.ins{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ins .c{background:var(--s1);border:1px solid var(--l1);border-left:3px solid var(--y);border-radius:12px;padding:14px 16px}
+.ins .c h4{font-family:'FF Sans';text-transform:uppercase;font-weight:400;font-size:20px;color:var(--y);margin:0 0 8px;line-height:.9}
+.ins .c p{margin:0;color:var(--fg2);font-size:13px;line-height:1.5}
+.wsw{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.wsw div{background:var(--s2);border-radius:12px;padding:14px 16px}
+.wsw h4{font-family:'FF Sans';font-weight:400;text-transform:uppercase;color:var(--y);font-size:22px;margin:0 0 8px;line-height:.9}
+.wsw p{margin:0;color:var(--fg2);line-height:1.5;font-size:13px}
+.tw{overflow:auto;border-radius:14px;border:1px solid var(--l1)}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums;font-size:12.5px}
+th{position:sticky;top:0;background:var(--s2);color:var(--fg3);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;text-align:right;padding:10px 10px;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+td{padding:9px 10px;border-top:1px solid var(--l1);text-align:right;white-space:nowrap}
+tr.hl td{background:rgba(255,222,20,.07)}
+td .ix{font-size:10.5px;margin-left:6px}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--fg3);margin:4px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.mbars .r{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;margin:8px 0;font-size:12px;color:var(--fg2)}
+.stack{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--s3)}
+.stack span{display:block;height:100%;font-size:10px;color:#000;font-weight:700;padding-left:4px;line-height:22px;overflow:hidden;white-space:nowrap}
+.bench{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.bench .kpi .v{font-size:40px}
+.foot{color:var(--fg3);font-size:11.5px;margin-top:30px;line-height:1.6;border-top:1px solid var(--l1);padding-top:14px}
+.tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;padding:3px 7px;border-radius:999px;background:var(--s3);color:var(--fg2);text-transform:uppercase}
+@media (max-width:900px){.kpis,.bench{grid-template-columns:repeat(2,1fr)}.grid2,.wsw{grid-template-columns:1fr}.hero h1{font-size:48px}.hero .rd{width:64px;right:16px}.hero .div{right:96px}.wrap{padding:0 16px 40px}.kpi .v{font-size:38px}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="k">JD Sports Canada · eCommerce · Measurement</div>
+  <h1 class="disp">Agentic<span>Traffic</span></h1>
+  <div class="sub" id="heroSub"></div>
+  <div class="div"></div>
+  <svg class="rd" viewBox="0 0 144 144" role="img" aria-label="JD Sports"><path fill="currentColor" d="M 88.144531 52.375 L 81.914062 91.605469 C 81.914062 91.605469 105.574219 95.359375 109.203125 72.070312 C 112.828125 48.777344 88.144531 52.375 88.144531 52.375"/><path fill="currentColor" d="M 72 0 C 32.234375 0 0 32.234375 0 72 C 0 111.765625 32.234375 144 72 144 C 111.765625 144 144 111.765625 144 72 C 144 52.90625 136.414062 34.589844 122.910156 21.089844 C 109.410156 7.585938 91.097656 0 72 0 M 21.121094 108.078125 L 23.359375 91.359375 C 50.320312 91.359375 54.878906 36.238281 54.878906 36.238281 L 72 36.238281 C 59.839844 115.359375 21.121094 108.078125 21.121094 108.078125 M 87.121094 106.160156 L 63.121094 106.160156 L 74.878906 36.078125 L 98.878906 36.078125 C 121.28125 36.078125 129.601562 53.597656 126.71875 71.199219 C 124.1875 91.152344 107.230469 106.117188 87.121094 106.160156"/></svg>
+</header>
+<div class="wrap">
+  <div class="bar">
+    <div class="grp"><span class="lab">Period</span><span id="perP"></span></div>
+    <div class="grp"><span class="lab">Ending</span><select class="pill" id="endSel"></select></div>
+    <div class="grp"><span class="lab">Attribution</span><span id="attP"></span></div>
+    <div class="grp"><span class="lab">Baseline</span><select class="pill" id="baseSel"></select></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+
+  <section id="t-ov">
+    <h2 class="disp">How AI did</h2>
+    <p class="note" id="ovNote"></p>
+    <div class="kpis" id="kpis"></div>
+    <h2 class="disp">What it means</h2>
+    <div class="ins" id="ins"></div>
+    <h2 class="disp">Us vs the market</h2>
+    <p class="note">Last 13 weeks against Graphite's State of Gen AI (Similarweb data to Sep 2026). Ahead or behind is judged on growth, not size.</p>
+    <div class="bench" id="bench"></div>
+    <h2 class="disp">Trend</h2>
+    <div class="stackp">
+      <div class="panel"><h3 class="disp">Sessions and revenue</h3><div class="sub"><span id="granP"></span> AI sessions (bars) and AI revenue on the selected attribution (line). The selected period is highlighted.</div><div class="ch big"><canvas id="cTrend"></canvas></div></div>
+      <div class="panel"><h3 class="disp">Share of the site</h3><div class="sub">AI as a % of all site sessions and revenue, by <span id="granL">week</span>.</div><div class="ch big"><canvas id="cShare"></canvas></div></div>
+    </div>
+  </section>
+
+  <section id="t-be">
+    <h2 class="disp">What they do on site</h2>
+    <p class="note">Every engagement and conversion metric for AI traffic against the other ways people reach jdsports.ca, for the selected period. The small figure is the index against the baseline (100 = same). Sessions, duration, pages, product views and funnel steps come from Shopify sessions; orders and revenue use the selected attribution.</p>
+    <div class="tw"><table id="beTbl"></table></div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="panel"><h3 class="disp">Funnel</h3><div class="sub">Share of sessions reaching each step, selected period.</div><div class="ch"><canvas id="cFunnel"></canvas></div></div>
+      <div class="panel"><h3 class="disp">Over time</h3><div class="sub"><span id="beMetP"></span> 4-week rolling.</div><div class="ch"><canvas id="cBeTrend"></canvas></div></div>
+    </div>
+  </section>
+
+  <section id="t-pl">
+    <h2 class="disp">Which assistants</h2>
+    <p class="note" id="plNote"></p>
+    <div class="grid2">
+      <div class="panel"><h3 class="disp">Sessions by assistant</h3><div class="sub">Sessions by week or retail month (set on Overview), stacked.</div><div class="ch"><canvas id="cPlat"></canvas></div></div>
+      <div class="panel"><h3 class="disp">Us vs the market</h3><div class="sub">Our share of AI sessions by assistant (selected period) vs Graphite's US AI referral share (Sep 2026).</div><div class="ch"><canvas id="cPlatMkt"></canvas></div></div>
+    </div>
+    <div class="tw" style="margin-top:12px"><table id="plTbl"></table></div>
+  </section>
+
+  <section id="t-lp">
+    <h2 class="disp">Where they land, what they buy</h2>
+    <p class="note">Last 3 full months. AI assistants send people straight to product pages; this shows which ones and what sells, so content and feed work can follow demand.</p>
+    <div class="grid2">
+      <div class="panel"><h3 class="disp">Landing page type</h3><div class="sub">Share of sessions by the first page seen.</div><div class="mbars" id="lpType"></div></div>
+      <div class="panel"><h3 class="disp">Device</h3><div class="sub">Share of sessions. Graphite: 78% of US AI usage is mobile.</div><div class="mbars" id="devMix"></div></div>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="panel"><h3 class="disp">Top landing pages</h3><div class="sub">AI sessions, add to cart and purchase rate.</div><div class="tw" style="max-height:460px"><table id="lpTbl"></table></div></div>
+      <div class="panel"><h3 class="disp">What AI visitors buy</h3><div class="sub">First-click AI revenue by product, with brand mix below.</div><div class="tw" style="max-height:300px"><table id="prTbl"></table></div><div class="mbars" id="brandMix" style="margin-top:10px"></div></div>
+    </div>
+  </section>
+
+  <section id="t-ds">
+    <h2 class="disp">Discovery vs close</h2>
+    <p class="note">First click credits the channel that started the journey; last non-direct click credits the last named channel before purchase. A gap tells you whether AI mainly introduces customers or closes sales.</p>
+    <div class="grid2">
+      <div class="panel"><h3 class="disp">First vs last non-direct</h3><div class="sub">Weekly AI revenue, 4-week rolling.</div><div class="ch"><canvas id="cAttr"></canvas></div></div>
+      <div class="panel"><h3 class="disp">New customers</h3><div class="sub">Share of first-click orders from new customers, 4-week rolling.</div><div class="ch"><canvas id="cNew"></canvas></div></div>
+    </div>
+  </section>
+
+  <section id="t-mk">
+    <h2 class="disp">Searchable data</h2>
+    <p class="note">From Searchable (app.searchable.com, JD Sports CA project): how often JD appears when people ask AI assistants about trainers, sportswear and where to buy them in Canada, against competitors. This measures visibility in answers; the other tabs measure the traffic those answers send.</p>
+    <div class="grid2">
+      <div class="panel"><h3 class="disp">AI answer visibility</h3><div class="sub">Searchable: share of tracked prompts (Canada, all models) where JD is mentioned, weekly. The prompt set grew from 24 to 532 answers a day in Sep, so compare from October only.</div><div class="ch"><canvas id="cVis"></canvas></div></div>
+      <div class="panel"><h3 class="disp">Competitor ranking</h3><div class="sub"><span id="rkP"></span></div><div class="tw"><table id="rkTbl"></table></div></div>
+    </div>
+  </section>
+
+  <section id="t-dt">
+    <h2 class="disp">AI traffic data</h2>
+    <p class="note">By week (Sunday to Saturday) or retail month. <span id="dtG"></span> <button class="pill" id="csv">Download CSV</button></p>
+    <div class="tw" style="max-height:640px"><table id="dtTbl"></table></div>
+  </section>
+
+  <div class="foot" id="foot"></div>
+</div>
+<script>
+/*__DATA__*/
+(function(){
+const D=window.D,K=D.keys,ix={};K.forEach((k,i)=>ix[k]=i);
+const NAMES={ai:'AI assistants',ai_chatgpt:'ChatGPT',ai_perplexity:'Perplexity',ai_copilot:'Copilot',ai_gemini:'Gemini',ai_claude:'Claude',ai_other:'Other AI (Meta AI, Grok, Duck.ai, Muse)',organic_search:'Organic search',paid_search:'Paid search',direct:'Direct',paid_social:'Paid social',email_sms:'Email & SMS',site:'Whole site'};
+const PCOL={ai_chatgpt:'#FFDE14',ai_perplexity:'#43D5B0',ai_copilot:'#CCCCCC',ai_gemini:'#EFFF04',ai_claude:'#6F6F6F',ai_other:'#3D3D3D'};
+const S={per:'1',end:D.weeks.length-1,mend:D.rmonths.length-1,gran:'w',att:'ln',base:'organic_search',tab:'ov',beMet:'cvr'};
+const $=id=>document.getElementById(id);
+const fmtN=x=>x==null||!isFinite(x)?'–':Math.round(x).toLocaleString('en-CA');
+const fmtD=x=>!isFinite(x)?'–':'$'+Math.round(x).toLocaleString('en-CA');
+const fmtD2=x=>!isFinite(x)?'–':'$'+x.toFixed(2);
+const fmtP=(x,d=1)=>!isFinite(x)?'–':(x*100).toFixed(d)+'%';
+const fmtS=x=>!isFinite(x)?'–':Math.floor(x/60)+'m '+String(Math.round(x%60)).padStart(2,'0')+'s';
+const fmtF=x=>!isFinite(x)?'–':x.toFixed(2);
+const wkLabel=w=>new Date(w+'T00:00:00Z').toLocaleDateString('en-CA',{month:'short',day:'numeric',timeZone:'UTC'});
+const addDays=(w,n)=>{const t=new Date(w+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+n);return t.toISOString().slice(0,10)};
+const sumW=(g,idxs)=>{const a=new Array(K.length).fill(0);idxs.forEach(i=>{const r=D.weekly[g]&&D.weekly[g][i];if(r)r.forEach((v,j)=>a[j]+=v)});return a};
+// metrics
+const MET={
+ ses:{n:'Sessions',f:fmtN,vol:1,c:a=>a[ix.ses]},
+ dur:{n:'Avg session time',f:fmtS,c:a=>a[ix.dur]/a[ix.ses]},
+ pps:{n:'Pages / session',f:fmtF,c:a=>a[ix.pv]/a[ix.ses]},
+ pdp:{n:'Product views / session',f:fmtF,c:a=>a[ix.pdp]/a[ix.ses]},
+ bnc:{n:'Bounce rate',f:fmtP,inv:1,c:a=>a[ix.bnc]/a[ix.ses]},
+ atc:{n:'Add to cart rate',f:fmtP,c:a=>a[ix.atc]/a[ix.ses]},
+ chk:{n:'Reached checkout',f:fmtP,c:a=>a[ix.chk]/a[ix.ses]},
+ cvr:{n:'Conversion rate',f:a=>fmtP(a,2),c:a=>a[ix.cmp]/a[ix.ses]},
+ ord:{n:'Orders',f:fmtN,vol:1,c:a=>a[ix[S.att+'_ord']]},
+ net:{n:'Net revenue',f:fmtD,vol:1,c:a=>a[ix[S.att+'_net']]},
+ aov:{n:'AOV',f:fmtD,c:a=>a[ix[S.att+'_aovx']]/a[ix[S.att+'_ord']]},
+ rps:{n:'Revenue / session',f:fmtD2,c:a=>a[ix[S.att+'_net']]/a[ix.ses]},
+ newp:{n:'New customer %',f:fmtP,c:a=>a[ix[S.att+'_ord_n']]/a[ix[S.att+'_ord']]},
+};
+function periodIdx(end,n){const o=[];for(let i=Math.max(0,end-n+1);i<=end;i++)o.push(i);return o}
+const MW=D.rmonths.map(m=>D.weeks.map((w,i)=>i).filter(i=>D.rmon[i]===m.k));
+function nWeeks(){if(S.per==='ytd'){const y=D.weeks[S.end].slice(0,4);return D.weeks.filter((w,i)=>i<=S.end&&w>=y+'-01-01').length}return +S.per}
+function idxOf(w){return D.weeks.indexOf(w)}
+function periods(){
+ if(S.per==='m'){const k=S.mend,cur=MW[k]||[],prev=MW[k-1]||[],ly=MW[k-12]||[];const avg4=[].concat(...[k-3,k-2,k-1].filter(x=>x>=0).map(x=>MW[x]));
+  const e=cur[cur.length-1];const y=D.weeks[e].slice(0,4);const ytd=D.weeks.map((w,i)=>i).filter(i=>i<=e&&D.weeks[i]>=y+'-01-01');
+  return {n:cur.length,cur,prev,ly,avg4,ytd,month:true,prevScale:cur.length/Math.max(1,prev.length),lyScale:cur.length/Math.max(1,ly.length)}}
+ const n=nWeeks(),e=S.end,cur=periodIdx(e,n);
+ const prev=periodIdx(e-n,n).filter(i=>i>=0&&i<e-n+1);
+ const ly=cur.map(i=>idxOf(addDays(D.weeks[i],-364))).filter(i=>i>=0);
+ const avg4=periodIdx(e-n,4).filter(i=>i>=0);
+ const y=D.weeks[e].slice(0,4);const ytd=D.weeks.map((w,i)=>i).filter(i=>i<=e&&D.weeks[i]>=y+'-01-01');
+ return {n,cur,prev,ly,avg4,ytd};
+}
+function val(m,g,idxs,scale){const a=sumW(g,idxs);let v=MET[m].c(a);if(MET[m].vol&&scale)v=v*scale;return v}
+function chg(cur,base){if(!isFinite(cur)||!isFinite(base)||base===0)return null;return cur/base-1}
+function chip(c,m,rate){if(c==null)return '<b class="flat">–</b>';const good=MET[m].inv?c<0:c>0;const cls=Math.abs(c)<0.005?'flat':(good?'up':'dn');const s=(c>0?'▲ ':'▼ ')+(Math.abs(c)*100).toFixed(Math.abs(c)<0.1?1:0)+'%';return `<b class="${cls}">${s}</b>`}
+function perLabel(){const p=periods();const a=D.weeks[p.cur[0]],b=addDays(D.weeks[p.cur[p.cur.length-1]],6);return (p.month?D.rmonths[S.mend].l+' (retail month, ':'')+wkLabel(a)+' to '+wkLabel(b)+', '+b.slice(0,4)+(p.month?')':'')}
+// ---------- controls ----------
+function pills(el,opts,key,cb){$(el).innerHTML=opts.map(([v,l])=>`<button class="pill${S[key]==v?' on':''}" data-v="${v}">${l}</button>`).join('');$(el).onclick=e=>{const b=e.target.closest('button');if(!b)return;S[key]=b.dataset.v;pills(el,opts,key,cb);cb()}}
+const TABS=[['ov','Overview'],['be','Behaviour vs baselines'],['pl','Assistants'],['lp','Pages & products'],['ds','Discovery vs close'],['mk','Searchable data'],['dt','Data']];
+pills('tabs',TABS,'tab',()=>{document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='t-'+S.tab));render()});
+pills('perP',[['1','Week'],['4','4 weeks'],['13','13 weeks'],['m','Retail month'],['ytd','YTD']],'per',()=>{fillEnd();render()});
+pills('attP',[['ln','Last non-direct'],['fc','First click']],'att',render);
+function fillEnd(){if(S.per==='m'){$('endSel').innerHTML=D.rmonths.map((m,i)=>`<option value="${i}">${m.l}${m.partial?' (to date)':''}</option>`).reverse().join('');$('endSel').value=S.mend}else{$('endSel').innerHTML=D.weeks.map((w,i)=>`<option value="${i}">w/c ${wkLabel(w)} ${w.slice(0,4)}</option>`).reverse().join('');$('endSel').value=S.end}}
+fillEnd();$('endSel').onchange=e=>{if(S.per==='m')S.mend=+e.target.value;else S.end=+e.target.value;render()};
+$('baseSel').innerHTML=['organic_search','paid_search','direct','site'].map(g=>`<option value="${g}">${NAMES[g]}</option>`).join('');$('baseSel').onchange=e=>{S.base=e.target.value;render()};
+document.querySelector('#t-ov').classList.add('on');
+// ---------- charts ----------
+Chart.defaults.font.family="'Inter Tight'";Chart.defaults.color='#8A8B8C';Chart.defaults.borderColor='#2E2E2E';
+const charts={};
+function chart(id,cfg){if(charts[id])charts[id].destroy();cfg.options=Object.assign({responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{labels:{boxWidth:10,boxHeight:10}}}},cfg.options||{});charts[id]=new Chart($(id),cfg)}
+const grid={color:'#2E2E2E',borderDash:[3,3]};
+function roll(arr,n=4){return arr.map((_,i)=>{if(i<n-1)return null;let s=0,c=0;for(let j=i-n+1;j<=i;j++){if(arr[j]!=null&&isFinite(arr[j])){s+=arr[j];c++}}return c?s/c:null})}
+function rollRatio(g,num,den,n=4){return D.weeks.map((_,i)=>{if(i<n-1)return null;const a=sumW(g,periodIdx(i,n));return den(a)?num(a)/den(a):null})}
+// ---------- render ----------
+function render(){
+ const p=periods();
+ $('heroSub').textContent=`ChatGPT, Perplexity, Gemini, Copilot and Claude referrals to jdsports.ca, measured against search, direct and the whole site. ${perLabel()}. Shopify data to ${D.lastDay}.`;
+ if(S.tab==='ov')ov(p);if(S.tab==='be')be(p);if(S.tab==='pl')pl(p);if(S.tab==='lp')lp();if(S.tab==='ds')ds();if(S.tab==='mk')mk(p);if(S.tab==='dt')dtt();
+ $('foot').innerHTML=`Source: Shopify Analytics (ShopifyQL), referring channel and traffic type, ${D.weeks[0]} to ${D.lastDay}. AI = sessions whose referring channel is an AI assistant (chatgpt.com, perplexity, copilot, gemini, claude, others). Google AI Overviews and AI Mode clicks arrive as Google organic and cannot be separated by any site analytics, so the AI total is a floor. Visibility: Searchable. Market: ${D.market.source}. Built ${D.built}. Weeks run Sunday to Saturday; same week last year = 52 weeks earlier.`;
+}
+function series(fn){// returns {labels, vals, hl} by current granularity
+ if(S.gran==='m'){return {labels:D.rmonths.map(m=>m.l),vals:MW.map(ws=>fn(ws)),hl:D.rmonths.map((m,i)=>S.per==='m'?i===S.mend:MW[i].some(w=>periods().cur.includes(w)))}}
+ return {labels:D.weeks.map(wkLabel),vals:D.weeks.map((w,i)=>fn([i])),hl:D.weeks.map((w,i)=>periods().cur.includes(i))};
+}
+function ov(p){
+ const avgL=p.month?'vs 3-month avg':'vs 4-wk avg';
+ $('ovNote').innerHTML=`${perLabel()} vs the ${p.month?'previous retail month':'previous '+(p.n==1?'week':p.n+' weeks')}, the same ${p.month?'month':(p.n==1?'week':'weeks')} last year, the ${p.month?'3 months':'4 weeks'} before and the ${D.weeks[p.cur[p.cur.length-1]].slice(0,4)} year-to-date average, all scaled to the same number of weeks.`;
+ const ks=['ses','net','ord','cvr','atc','aov','newp','share'];
+ const sc=(idx)=>p.n/Math.max(1,idx.length);
+ $('kpis').innerHTML=ks.map(m=>{
+  let v,vp,vl,v4,vy;
+  if(m==='share'){const sh=idx=>{const a=sumW('ai',idx),s=sumW('site',idx);return a[ix[S.att+'_net']]/s[ix[S.att+'_net']]};v=sh(p.cur);vp=sh(p.prev);vl=sh(p.ly);v4=sh(p.avg4);vy=sh(p.ytd);
+   return card('AI share of site revenue',fmtP(v,2),[['vs prev',chg(v,vp)],['vs last year',chg(v,vl)],[avgL,chg(v,v4)],['vs YTD avg',chg(v,vy)]],'net')}
+  v=val(m,'ai',p.cur);vp=val(m,'ai',p.prev,sc(p.prev));vl=val(m,'ai',p.ly,sc(p.ly));
+  v4=val(m,'ai',p.avg4,sc(p.avg4));vy=val(m,'ai',p.ytd,sc(p.ytd));
+  const lab=m==='net'?(S.att==='fc'?'AI revenue (first click)':'AI revenue (last non-direct)'):(m==='ord'?'AI orders':'AI '+MET[m].n.toLowerCase());
+  return card(m==='ses'?'AI sessions':lab,MET[m].f(v),[['vs prev',chg(v,vp)],['vs last year',chg(v,vl)],[avgL,chg(v,v4)],['vs YTD avg',chg(v,vy)]],m)}).join('');
+ bench();
+ $('ins').innerHTML=D.insights.map(x=>`<div class="c"><h4>${x.h}</h4><p>${x.t}</p></div>`).join('');
+ pills('granP',[['w','Weekly'],['m','Monthly']],'gran',()=>ov(periods()));$('granL').textContent=S.gran==='m'?'retail month':'week';
+ const sS=series(ws=>sumW('ai',ws)[ix.ses]),sR=series(ws=>sumW('ai',ws)[ix[S.att+'_net']]);
+ const tick={maxTicksLimit:S.gran==='m'?24:14,autoSkip:true,maxRotation:0};
+ chart('cTrend',{data:{labels:sS.labels,datasets:[{type:'bar',label:'AI sessions',data:sS.vals,backgroundColor:sS.hl.map(h=>h?'#EFFF04':'rgba(255,222,20,.6)'),yAxisID:'y',order:2},{type:'line',label:'AI revenue ('+(S.att==='fc'?'first click':'last non-direct')+')',data:sR.vals,borderColor:'#43D5B0',backgroundColor:'#43D5B0',pointRadius:S.gran==='m'?3:1.5,borderWidth:2.5,tension:.25,yAxisID:'y1',order:1}]},options:{plugins:{legend:{labels:{boxWidth:10,boxHeight:10,font:{size:12}}}},scales:{x:{grid:{display:false},ticks:tick},y:{grid,title:{display:true,text:'Sessions'},ticks:{font:{size:12}}},y1:{position:'right',grid:{display:false},title:{display:true,text:'Revenue'},ticks:{font:{size:12},callback:v=>'$'+(v/1000).toFixed(v<10000?1:0)+'k'}}}}});
+ const shS=series(ws=>sumW('ai',ws)[ix.ses]/sumW('site',ws)[ix.ses]*100),shR=series(ws=>sumW('ai',ws)[ix[S.att+'_net']]/sumW('site',ws)[ix[S.att+'_net']]*100);
+ chart('cShare',{type:'line',data:{labels:shS.labels,datasets:[{label:'% of site sessions',data:shS.vals,borderColor:'#FFDE14',backgroundColor:'#FFDE14',pointRadius:S.gran==='m'?3:0,borderWidth:2.5,tension:.25},{label:'% of site revenue',data:shR.vals,borderColor:'#43D5B0',backgroundColor:'#43D5B0',pointRadius:S.gran==='m'?3:0,borderWidth:2.5,tension:.25}]},options:{scales:{x:{grid:{display:false},ticks:tick},y:{grid,ticks:{font:{size:12},callback:v=>v.toFixed(2)+'%'}}}}});
+}
+function bench(){
+ const M=D.market;const n=13,e=S.per==='m'?(MW[S.mend].slice(-1)[0]):S.end;const cur=periodIdx(e,n);const ly=cur.map(i=>idxOf(addDays(D.weeks[i],-364))).filter(i=>i>=0);
+ const g=val('ses','ai',cur)/val('ses','ai',ly)-1;const sh=val('ses','ai',cur)/val('ses','site',cur);
+ const mob=(()=>{const x=mix(D.dev,'ai',last3()).find(r=>r[0]==='mobile');return x?x[1]:null})();
+ const cg=val('ses','ai_chatgpt',cur)/val('ses','ai',cur);
+ const b=(l,v,s,cls)=>`<div class="kpi"><div class="l">${l}</div><div class="v disp ${cls||''}">${v}</div><div class="cmp" style="display:block">${s}</div></div>`;
+ $('bench').innerHTML=b('AI sessions growth (YoY)',(g>0?'+':'')+Math.round(g*100)+'%',`Market AI referrals: +${M.ai_referral_yoy_us}% US, +${M.ai_referral_yoy_ww}% worldwide. ${g*100>M.ai_referral_yoy_ww?'We are growing faster than the market.':'We are growing slower than the market.'}`,g*100>M.ai_referral_yoy_ww?'up':'dn')+
+  b('AI share of our sessions',fmtP(sh,2),`Market: ${M.ai_share_of_site_traffic}. LLM usage itself grew ${M.llm_sessions_yoy_us}% in the US.`)+
+  b('ChatGPT share of our AI',fmtP(cg,0),`Market: ChatGPT ${M.referral_share_us.ChatGPT}% of US AI referrals, Claude ${M.referral_share_us.Claude}%, Gemini ${M.referral_share_us.Gemini}%. We are more dependent on ChatGPT than the market.`)+
+  b('Mobile share of AI visits',mob!=null?fmtP(mob,0):'–',`Market: ${M.mobile_share_us}% of US AI usage is mobile, ${M.in_app_share_us}% in-app. AI Overviews now show on ${M.aio_share_us_searches['2026-08']}% of US Google searches (from ${M.aio_share_us_searches['2025-09']}%).`);
+}
+function card(l,v,c,m){return `<div class="kpi"><div class="l">${l}</div><div class="v disp">${v}</div><div class="cmp">${c.map(([a,b])=>`<span>${a}</span>${chip(b,m)}`).join('')}</div></div>`}
+const BSEG=['ai','ai_chatgpt','organic_search','paid_search','direct','paid_social','email_sms','site'];
+const BMET=['ses','dur','pps','pdp','bnc','atc','chk','cvr','ord','net','aov','rps','newp'];
+function be(p){
+ const base=S.base;const bv={};BMET.forEach(m=>bv[m]=val(m,base,p.cur));
+ let h='<thead><tr><th>Metric</th>'+BSEG.map(g=>`<th>${NAMES[g]}</th>`).join('')+'</tr></thead><tbody>';
+ BMET.forEach(m=>{h+=`<tr class="${['cvr','atc','pdp','newp'].includes(m)?'hl':''}"><td>${MET[m].n}</td>`+BSEG.map(g=>{const v=val(m,g,p.cur);const showIx=!MET[m].vol&&g!==base&&isFinite(v)&&bv[m];const x=showIx?Math.round(v/bv[m]*100):null;const cls=x==null?'':((MET[m].inv?x<100:x>100)?'up':'dn');return `<td>${MET[m].f(v)}${x!=null?`<span class="ix ${cls}">${x}</span>`:''}</td>`}).join('')+'</tr>'});
+ $('beTbl').innerHTML=h+'</tbody>';
+ const segs=['ai','organic_search','paid_search','direct','site'];const cols=['#FFDE14','#CCCCCC','#6F6F6F','#3D3D3D','#43D5B0'];
+ chart('cFunnel',{type:'bar',data:{labels:['Added to cart','Reached checkout','Purchased'],datasets:segs.map((g,i)=>{const a=sumW(g,p.cur);return {label:NAMES[g],data:[a[ix.atc]/a[ix.ses]*100,a[ix.chk]/a[ix.ses]*100,a[ix.cmp]/a[ix.ses]*100],backgroundColor:cols[i]}})},options:{scales:{x:{grid:{display:false}},y:{grid,ticks:{callback:v=>v+'%'}}}}});
+ pills('beMetP',[['cvr','Conversion'],['atc','Add to cart'],['pps','Pages/session'],['pdp','Product views'],['dur','Session time'],['rps','Rev/session']],'beMet',()=>be(periods()));
+ const lbl=D.weeks.map(wkLabel);
+ chart('cBeTrend',{type:'line',data:{labels:lbl,datasets:segs.map((g,i)=>({label:NAMES[g],data:D.weeks.map((_,j)=>j<3?null:(()=>{const v=MET[S.beMet].c(sumW(g,periodIdx(j,4)));return ['cvr','atc','bnc','chk'].includes(S.beMet)?v*100:v})()),borderColor:cols[i],pointRadius:0,borderWidth:g==='ai'?3:1.5}))},options:{scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid}}}});
+}
+const PL=['ai_chatgpt','ai_perplexity','ai_gemini','ai_copilot','ai_claude','ai_other'];
+function pl(p){
+ const tot=val('ses','ai',p.cur);
+ $('plNote').innerHTML=D.plNote.replace('{chatgpt}',fmtP(val('ses','ai_chatgpt',p.cur)/tot));
+ const lbl=D.weeks.map(wkLabel);
+ const sl=series(ws=>0).labels;chart('cPlat',{type:'bar',data:{labels:sl,datasets:PL.map(g=>({label:NAMES[g],data:series(ws=>sumW(g,ws)[ix.ses]).vals,backgroundColor:PCOL[g],stack:'s'}))},options:{scales:{x:{stacked:true,grid:{display:false},ticks:{maxTicksLimit:10}},y:{stacked:true,grid}}}});
+ const mkt=D.market.referral_share_us;const names=['ChatGPT','Gemini','Claude','Perplexity','Copilot'];const keyOf={ChatGPT:'ai_chatgpt',Gemini:'ai_gemini',Claude:'ai_claude',Perplexity:'ai_perplexity',Copilot:'ai_copilot'};
+ chart('cPlatMkt',{type:'bar',data:{labels:names,datasets:[{label:'JD share of AI sessions',data:names.map(n=>val('ses',keyOf[n],p.cur)/tot*100),backgroundColor:'#FFDE14'},{label:'US market share of AI referrals (Graphite)',data:names.map(n=>mkt[n]||null),backgroundColor:'#6F6F6F'}]},options:{indexAxis:'y',scales:{x:{grid,ticks:{callback:v=>v+'%'}},y:{grid:{display:false}}}}});
+ const ms=['ses','cvr','atc','pps','ord','net','rps','newp'];
+ let h='<thead><tr><th>Assistant</th><th>Share</th>'+ms.map(m=>`<th>${MET[m].n}</th>`).join('')+'<th>vs last year</th></tr></thead><tbody>';
+ ['ai',...PL].forEach(g=>{const s=val('ses',g,p.cur);if(!s&&g!=='ai')return;const ly=val('ses',g,p.ly);h+=`<tr class="${g==='ai'?'hl':''}"><td>${NAMES[g]}</td><td>${fmtP(s/tot)}</td>`+ms.map(m=>`<td>${MET[m].f(val(m,g,p.cur))}</td>`).join('')+`<td>${chip(chg(s,ly),'ses')}</td></tr>`});
+ $('plTbl').innerHTML=h+'</tbody>';
+}
+function last3(){const ms=D.months.filter(m=>m<D.lastWeekEnd.slice(0,7));return ms.slice(-3)}
+function mix(map,seg,months){const c={};months.forEach(m=>{const o=map[m+'|'+seg]||{};for(const[k,v] of Object.entries(o))c[k]=(c[k]||0)+v});const t=Object.values(c).reduce((a,b)=>a+b,0)||1;return Object.entries(c).map(([k,v])=>[k,v/t]).sort((a,b)=>b[1]-a[1])}
+function bars(el,rows,colors){$(el).innerHTML=rows.map(([lab,parts])=>`<div class="r"><span>${lab}</span><div class="stack">${parts.map(([k,v],i)=>`<span title="${k} ${fmtP(v)}" style="width:${v*100}%;background:${colors[k]||colors._[i%colors._.length]}">${v>.07?k+' '+fmtP(v,0):''}</span>`).join('')}</div></div>`).join('')}
+function lp(){
+ const m3=last3();const segs=[['AI','ai'],['Organic search','organic_search'],['Paid search','paid_search'],['Direct','direct'],['Whole site','all']];
+ const cl={Product:'#FFDE14',Homepage:'#CCCCCC',Collection:'#43D5B0','Custom Page':'#6F6F6F',Search:'#A7A8A9',Checkout:'#3D3D3D',_:['#EFFF04','#8A8B8C','#2E2E2E']};
+ bars('lpType',segs.map(([l,s])=>[l,mix(D.lpt,s,m3).slice(0,6)]),cl);
+ bars('devMix',segs.map(([l,s])=>[l,mix(D.dev,s,m3).slice(0,3)]),{mobile:'#FFDE14',desktop:'#CCCCCC',tablet:'#6F6F6F',_:['#3D3D3D']});
+ const lps={};D.lp.filter(r=>m3.includes(r[0])).forEach(r=>{const o=lps[r[1]]=lps[r[1]]||[0,0,0];o[0]+=r[2];o[1]+=r[3];o[2]+=r[4]});
+ const top=Object.entries(lps).sort((a,b)=>b[1][0]-a[1][0]).slice(0,30);
+ $('lpTbl').innerHTML='<thead><tr><th>Landing page</th><th>Sessions</th><th>ATC</th><th>CVR</th></tr></thead><tbody>'+top.map(([k,v])=>`<tr><td title="${k}">${k.length>52?k.slice(0,50)+'…':k}</td><td>${fmtN(v[0])}</td><td>${fmtP(v[1]/v[0])}</td><td>${fmtP(v[2]/v[0])}</td></tr>`).join('')+'</tbody>';
+ const pr={},br={};D.prod.filter(r=>m3.includes(r[0])).forEach(r=>{const o=pr[r[1]]=pr[r[1]]||[0,0,r[2]];o[0]+=r[4];o[1]+=r[5];br[r[2]||'Other']=(br[r[2]||'Other']||0)+r[4]});
+ const tp=Object.entries(pr).sort((a,b)=>b[1][0]-a[1][0]).slice(0,25);
+ $('prTbl').innerHTML='<thead><tr><th>Product</th><th>Brand</th><th>Orders</th><th>Revenue</th></tr></thead><tbody>'+tp.map(([k,v])=>`<tr><td title="${k}">${k.length>44?k.slice(0,42)+'…':k}</td><td>${v[2]||''}</td><td>${fmtN(v[1])}</td><td>${fmtD(v[0])}</td></tr>`).join('')+'</tbody>';
+ const bt=Object.values(br).reduce((a,b)=>a+Math.max(b,0),0)||1;const bl=Object.entries(br).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,v/bt]);
+ bars('brandMix',[['Brand mix',bl.slice(0,8)]],{_:['#FFDE14','#43D5B0','#CCCCCC','#EFFF04','#6F6F6F','#A7A8A9','#3D3D3D','#8A8B8C']});
+}
+function ds(){
+ const lbl=D.weeks.map(wkLabel);
+ chart('cAttr',{type:'line',data:{labels:lbl,datasets:[{label:'First click',data:roll(D.weekly.ai.map(r=>r[ix.fc_net])),borderColor:'#FFDE14',pointRadius:0,borderWidth:2},{label:'Last non-direct click',data:roll(D.weekly.ai.map(r=>r[ix.ln_net])),borderColor:'#43D5B0',pointRadius:0,borderWidth:2}]},options:{scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid,ticks:{callback:v=>'$'+(v/1000).toFixed(1)+'k'}}}}});
+ const nn=(g)=>D.weeks.map((_,i)=>{if(i<3)return null;const a=sumW(g,periodIdx(i,4));return a[ix.fc_ord]?a[ix.fc_ord_n]/a[ix.fc_ord]*100:null});
+ chart('cNew',{type:'line',data:{labels:lbl,datasets:[{label:'AI',data:nn('ai'),borderColor:'#FFDE14',pointRadius:0,borderWidth:3},{label:'Organic search',data:nn('organic_search'),borderColor:'#CCCCCC',pointRadius:0,borderWidth:1.5},{label:'Whole site',data:nn('site'),borderColor:'#43D5B0',pointRadius:0,borderWidth:1.5}]},options:{scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid,min:0,max:100,ticks:{callback:v=>v+'%'}}}}});
+}
+function mk(p){
+ const v=D.searchable.weekly;
+ chart('cVis',{type:'line',data:{labels:v.map(r=>wkLabel(r[0])),datasets:[{label:'JD visibility %',data:v.map(r=>r[1]),borderColor:'#FFDE14',backgroundColor:'rgba(255,222,20,.15)',fill:true,pointRadius:v.map(r=>r[2]>=500?3:0),segment:{borderDash:c=>v[c.p0DataIndex][2]<500?[4,4]:undefined}}]},options:{scales:{x:{grid:{display:false}},y:{grid,min:0,ticks:{callback:x=>x+'%'}}}}});
+ if(!S.rk)S.rk='7d';
+ pills('rkP',[['7d','7 days'],['30d','30 days'],['90d','90 days']],'rk',()=>mk(periods()));
+ $('rkTbl').innerHTML='<thead><tr><th>Brand</th><th>Visibility</th><th>Share of voice</th><th>Avg position</th><th>Sentiment</th></tr></thead><tbody>'+D.searchable.rank[S.rk].map(r=>`<tr class="${r[0]==='JD Sports'?'hl':''}"><td>${r[0]}</td><td>${r[1]}%</td><td>${r[2]}%</td><td>#${r[3]}</td><td>${r[4]}</td></tr>`).join('')+'</tbody>';
+}
+function dtt(){
+ pills('dtG',[['w','Weekly'],['m','Monthly']],'gran',dtt);
+ const cols=['ses','dur','pps','pdp','bnc','atc','chk','cvr','ord','net','aov','rps','newp'];
+ const rows=S.gran==='m'?D.rmonths.map((m,i)=>[m.l+(m.partial?' (to date)':''),MW[i]]):D.weeks.map((w,i)=>[w,[i]]);
+ let h=`<thead><tr><th>${S.gran==='m'?'Retail month':'Week of'}</th>`+cols.map(m=>`<th>${MET[m].n}</th>`).join('')+'<th>% site sessions</th></tr></thead><tbody>';
+ for(let i=rows.length-1;i>=0;i--){const a=sumW('ai',rows[i][1]),st=sumW('site',rows[i][1]);h+=`<tr><td>${rows[i][0]}</td>`+cols.map(m=>`<td>${MET[m].f(MET[m].c(a))}</td>`).join('')+`<td>${fmtP(a[ix.ses]/st[ix.ses],2)}</td></tr>`}
+ $('dtTbl').innerHTML=h+'</tbody>';
+ $('csv').onclick=()=>{const out=[[S.gran==='m'?'retail_month':'week_start',...cols,'pct_site_sessions'].join(',')];rows.forEach(([l,ws])=>{const a=sumW('ai',ws),st=sumW('site',ws);out.push([l,...cols.map(m=>{const v=MET[m].c(a);return isFinite(v)?+v.toFixed(4):''}),(a[ix.ses]/st[ix.ses]).toFixed(5)].join(','))});const b=new Blob([out.join('\n')],{type:'text/csv'});const u=URL.createObjectURL(b);const l=document.createElement('a');l.href=u;l.download='jd_ai_traffic_'+(S.gran==='m'?'monthly':'weekly')+'.csv';l.click()};
+}
+render();
+})();
+</script>
+</body>
+</html>

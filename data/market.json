@@ -1,0 +1,6 @@
+{"source":"Graphite, The State of Gen AI (update to AI Is Much Bigger Than You Think), 9 Nov 2026, Similarweb data to Sep 2026","url":"https://graphite.io/research/the-state-of-genai",
+"llm_sessions_yoy_ww":37,"llm_sessions_yoy_us":45,"ai_referral_yoy_ww":92,"ai_referral_yoy_us":75,
+"referral_share_us":{"ChatGPT":66,"Claude":11,"Gemini":10},"referral_share_ww":{"ChatGPT":60,"Gemini":14,"Claude":10},
+"usage_share_chatgpt_ww":81.2,"ai_share_of_site_traffic":"under 1% on average (top 43k US sites)","mobile_share_us":78,"in_app_share_us":74,
+"aio_share_us_searches":{"2025-09":23,"2026-08":64},"perplexity_sessions_yoy":-27,"gemini_sessions_yoy":182,"claude_sessions_yoy":1901,
+"attribution_gap":"n8n case study: AI referral visits accounted for only 10% of conversions"}
