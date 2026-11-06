@@ -15,6 +15,13 @@ for k in ('lp', 'prod', 'lpt', 'dev'):
 net = sum(r[2+K.index('ln_net')] for r in p['daily'])
 assert abs(net - p['check_net_sales']) < 5, ('net sales mismatch', net, p['check_net_sales'])
 json.dump(d, open(raw, 'w'))
+# landing page types by day (Journeys tab) live beside raw.json
+ltf = os.path.join(os.path.dirname(raw), 'landing_types.json')
+if 'lt' in p:
+    L = json.load(open(ltf)) if os.path.exists(ltf) else {}
+    for c, rows in p['lt'].items():
+        L[c] = [r for r in L.get(c, []) if not (since <= r[0] <= until)] + rows
+    json.dump(L, open(ltf, 'w'), separators=(',', ':'))
 tmp = pull + '.dom.json'; json.dump(p['dom'], open(tmp, 'w'))
 subprocess.check_call([sys.executable, os.path.join(os.path.dirname(__file__), 'apply_domains.py'), raw, tmp])
 print(f'merged {since}..{until}: {len(p["daily"])} day-rows, net sales {net:,.0f} = Shopify {p["check_net_sales"]:,.0f}; months {p["months"]}')

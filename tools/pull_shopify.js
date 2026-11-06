@@ -37,8 +37,14 @@ window.__runPull=async()=>{
   for(const x of await q(`FROM sessions SHOW sessions, sessions_that_completed_checkout GROUP BY session_device_type, traffic_type, referring_channel ${MW} LIMIT 5000`)){const k=[mm,keep(seg(x.referring_channel,x.traffic_type)),x.session_device_type].join('|');const v=[+x.sessions,+x.sessions_that_completed_checkout];devA[k]=devA[k]?devA[k].map((a,i)=>a+v[i]):v}
  }
  const flat=o=>Object.entries(o).map(([k,v])=>{const p=k.split('|');return [p[0],p[1],p[2]==='null'?null:p[2],...v]});
+ // daily sessions by landing page type for AI, organic search and the whole site (Journeys tab)
+ const LM='sessions, sessions_with_cart_additions, sessions_that_reached_checkout, sessions_that_completed_checkout, average_session_duration, pageviews, products_viewed';
+ const lf=r=>r.map(x=>[x.day,x.landing_page_type,+x.sessions,+x.sessions_with_cart_additions,+x.sessions_that_reached_checkout,+x.sessions_that_completed_checkout,Math.round(+x.average_session_duration*(+x.sessions)),+x.pageviews,+x.products_viewed]);
+ const lt={ai:lf(await q(`FROM sessions SHOW ${LM} GROUP BY day, landing_page_type ${AIW} ${W} LIMIT 100000`)),
+  org:lf(await q(`FROM sessions SHOW ${LM} GROUP BY day, landing_page_type WHERE referring_channel IN ('google','bing','yahoo!','duckduckgo','ecosia','brave') AND traffic_type = 'organic' ${W} LIMIT 100000`)),
+  all:lf(await q(`FROM sessions SHOW ${LM} GROUP BY day, landing_page_type ${W} LIMIT 100000`))};
  const tot=(await q(`FROM sales SHOW net_sales ${W}`))[0];
- const out={since,until,months:months.map(x=>x[0].slice(0,7)),keys:KEYS,daily,dom,lp,prod,lpt:flat(lptA),dev:flat(devA),check_net_sales:+tot.net_sales};
+ const out={since,until,months:months.map(x=>x[0].slice(0,7)),keys:KEYS,daily,dom,lp,prod,lpt:flat(lptA),dev:flat(devA),lt,check_net_sales:+tot.net_sales};
  return 'B64START'+(await gz(JSON.stringify(out)))+'B64END';
 };
 })();

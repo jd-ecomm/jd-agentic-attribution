@@ -45,6 +45,9 @@ h2{font-size:34px;margin:28px 0 6px}
 .panel .sub{color:var(--fg3);font-size:12px;margin-bottom:10px}
 .ch{position:relative;height:300px}.ch.big{height:420px}.stackp{display:grid;gap:12px}
 .ins{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lg{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;font-size:11.5px;color:var(--fg3)}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.kpis.k3,.grid3{grid-template-columns:repeat(3,1fr)}.grid3{display:grid;gap:12px}.ch.sm{height:230px}
+@media (max-width:900px){.grid3,.kpis.k3{grid-template-columns:1fr}}
 .ins .c{background:var(--s1);border:1px solid var(--l1);border-left:3px solid var(--y);border-radius:12px;padding:14px 16px}
 .ins .c h4{font-family:'FF Sans';text-transform:uppercase;font-weight:400;font-size:20px;color:var(--y);margin:0 0 8px;line-height:.9}
 .ins .c p{margin:0;color:var(--fg2);font-size:13px;line-height:1.5}
@@ -138,7 +141,34 @@ td .ix{font-size:10.5px;margin-left:6px}
   </section>
 
   <section id="t-ds">
-    <h2 class="disp">Discovery vs close</h2>
+    <h2 class="disp">Customer journeys</h2>
+    <p class="note" id="jrNote"></p>
+    <div class="kpis k3" id="jrK"></div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="panel"><h3 class="disp">Where AI sits in the journey</h3><div class="sub">Orders with an AI visit, by where that visit came in the path. Organic search shown the same way for comparison.</div><div class="mbars" id="jrPos"></div></div>
+      <div class="panel"><h3 class="disp">Before and after the AI visit</h3><div class="sub">The touch just before the first AI visit, and the touch just after the last one. "Bought in that visit" means the AI visit ended in the order.</div><div class="mbars" id="jrBA"></div></div>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="panel"><h3 class="disp">Visits before buying</h3><div class="sub">Share of orders by number of visits in the journey.</div><div class="ch"><canvas id="cJrV"></canvas></div></div>
+      <div class="panel"><h3 class="disp">Days from first visit to order</h3><div class="sub">Share of orders by days between the first tracked visit and the purchase. Shopify keeps 30 days of visits per journey.</div><div class="ch"><canvas id="cJrD"></canvas></div></div>
+    </div>
+    <div class="grid2" style="margin-top:12px">
+      <div class="panel"><h3 class="disp">Most common AI journeys</h3><div class="sub">Touch paths for orders with an AI visit (repeat visits from the same source merged).</div><div class="tw" style="max-height:420px"><table id="jrPathAI"></table></div></div>
+      <div class="panel"><h3 class="disp">Most common organic search journeys</h3><div class="sub">Orders that started from organic search, for comparison.</div><div class="tw" style="max-height:420px"><table id="jrPathOrg"></table></div></div>
+    </div>
+
+    <h2 class="disp" style="margin-top:28px">On site, over time</h2>
+    <p class="note"><span id="osP"></span> How long AI visitors stay, how deep they go and how far down the funnel they get, against organic search and the whole site. <span id="osL"></span></p>
+    <div class="grid3" id="osGrid"></div>
+
+    <h2 class="disp" style="margin-top:28px">Searching or straight in</h2>
+    <p class="note" id="enNote"></p>
+    <div class="grid2">
+      <div class="panel"><h3 class="disp">How AI visits enter</h3><div class="sub">Share of AI sessions by landing page type, by retail month.</div><div class="ch"><canvas id="cEnt"></canvas></div></div>
+      <div class="panel"><h3 class="disp">What each entry leads to</h3><div class="sub">Selected period. AI vs organic search by landing page type.</div><div class="tw"><table id="enTbl"></table></div></div>
+    </div>
+
+    <h2 class="disp" style="margin-top:28px">Discovery vs close</h2>
     <p class="note">First click credits the channel that started the journey; last non-direct click credits the last named channel before purchase. A gap tells you whether AI mainly introduces customers or closes sales.</p>
     <div class="grid2">
       <div class="panel"><h3 class="disp">First vs last non-direct</h3><div class="sub">Weekly AI revenue, 4-week rolling.</div><div class="ch"><canvas id="cAttr"></canvas></div></div>
@@ -217,7 +247,7 @@ function chip(c,m,rate){if(c==null)return '<b class="flat">–</b>';const good=M
 function perLabel(){const p=periods();const a=D.weeks[p.cur[0]],b=addDays(D.weeks[p.cur[p.cur.length-1]],6);return (p.month?D.rmonths[S.mend].l+' (retail month, ':'')+wkLabel(a)+' to '+wkLabel(b)+', '+b.slice(0,4)+(p.month?')':'')}
 // ---------- controls ----------
 function pills(el,opts,key,cb){$(el).innerHTML=opts.map(([v,l])=>`<button class="pill${S[key]==v?' on':''}" data-v="${v}">${l}</button>`).join('');$(el).onclick=e=>{const b=e.target.closest('button');if(!b)return;S[key]=b.dataset.v;pills(el,opts,key,cb);cb()}}
-const TABS=[['ov','Overview'],['be','Behaviour vs baselines'],['pl','Assistants'],['lp','Pages & products'],['ds','Discovery vs close'],['mk','Searchable data'],['dt','Data']];
+const TABS=[['ov','Overview'],['be','Behaviour vs baselines'],['pl','Assistants'],['lp','Pages & products'],['ds','Journeys & discovery'],['mk','Searchable data'],['dt','Data']];
 pills('tabs',TABS,'tab',()=>{document.querySelectorAll('section').forEach(s=>s.classList.toggle('on',s.id==='t-'+S.tab));render()});
 pills('perP',[['1','Week'],['4','4 weeks'],['13','13 weeks'],['m','Retail month'],['ytd','YTD']],'per',()=>{fillEnd();render()});
 pills('attP',[['ln','Last non-direct'],['fc','First click']],'att',render);
@@ -320,8 +350,83 @@ function lp(){
  const bt=Object.values(br).reduce((a,b)=>a+Math.max(b,0),0)||1;const bl=Object.entries(br).filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k,v/bt]);
  bars('brandMix',[['Brand mix',bl.slice(0,8)]],{_:['#FFDE14','#43D5B0','#CCCCCC','#EFFF04','#6F6F6F','#A7A8A9','#3D3D3D','#8A8B8C']});
 }
+const SEGN={ai:'AI assistant',organic_search:'Organic search',paid_search:'Paid search',direct:'Direct',paid_social:'Paid social',organic_social:'Organic social',email_sms:'Email & SMS',shop_app:'Shop Pay / Shop app',other:'Other referral',none:'No visit data'};
+const SEGC={ai:'#FFDE14',organic_search:'#CCCCCC',paid_search:'#6F6F6F',direct:'#3D3D3D',paid_social:'#A7A8A9',organic_social:'#8A8B8C',email_sms:'#43D5B0',shop_app:'#EFFF04',other:'#2E2E2E',buy:'#43D5B0',start:'#8A8B8C'};
+const LTN={pdp:'Product page',home:'Homepage',plp:'Collection',search:'Search results',checkout:'Checkout',cart:'Cart',account:'Account',page:'Content page',blog:'Blog',other:'Other'};
+function jrWeeks(p){// selected period, at least 13 weeks, within journey data
+ const JW=D.jr.w0;let ws=p.cur.slice();if(ws.length<13){const e=ws[ws.length-1];ws=periodIdx(e,13)}return ws.filter(i=>i>=JW)}
+function jrSum(c,ws){const a=new Array(13).fill(0);ws.forEach(i=>{const r=D.jr.c[c][i-D.jr.w0];if(r)r.forEach((v,j)=>a[j]+=v)});return a}
 function ds(){
- const lbl=D.weeks.map(wkLabel);
+ const p=periods(),lbl=D.weeks.map(wkLabel);
+ // ---------- journeys ----------
+ const ws=jrWeeks(p);
+ if(!ws.length){$('jrNote').textContent='Order journey data starts '+D.weeks[D.jr.w0]+'. Pick a later period.';}
+ else{
+ const a0=D.weeks[ws[0]],a1=addDays(D.weeks[ws[ws.length-1]],6);
+ const rows=D.jr.ai.filter(r=>ws.includes(r[0]));
+ const A=jrSum('ai',ws),O=jrSum('org',ws),T=jrSum('all',ws);
+ const prevWs=ws.map(i=>i-ws.length).filter(i=>i>=D.jr.w0);const Ap=jrSum('ai',prevWs),Tp=jrSum('all',prevWs);
+ $('jrNote').innerHTML=`Every order from ${wkLabel(a0)} to ${wkLabel(a1)}, ${a1.slice(0,4)}${ws.length>p.cur.length?' (journeys need at least 13 weeks of orders to be readable, so short periods are widened)':''}. Shopify records each visit a customer made before buying (source and landing page), so this shows the whole path, not one attributed click. ${fmtN(A[0])} of ${fmtN(T[0])} orders had at least one AI visit.`;
+ const pos={only:0,both:0,start:0,close:0,mid:0},bef={},aft={};
+ rows.forEach(r=>{const st=r[5]?r[5].split('>').map(x=>x.split(':')):[];if(!st.length)return;const ai=st.map((x,i)=>x[0]==='ai'?i:-1).filter(i=>i>=0);const i0=ai[0],i1=ai[ai.length-1],L=st.length;
+  const k=ai.length===L?'only':(i0===0&&i1===L-1?'both':(i0===0?'start':(i1===L-1?'close':'mid')));pos[k]++;
+  const b=i0>0?st[i0-1][0]:'start';bef[b]=(bef[b]||0)+1;const f=i1<L-1?st[i1+1][0]:'buy';aft[f]=(aft[f]||0)+1});
+ const np=Object.values(pos).reduce((a,b)=>a+b,0)||1;
+ const opat={};D.jr.org.filter(r=>ws.includes(r[0])).forEach(r=>opat[r[1]]=(opat[r[1]]||0)+r[2]);
+ const op={only:0,both:0,closeOther:0};ws.forEach(i=>{const r=D.jr.orgPos[i-D.jr.w0];if(r){op.only+=r[0];op.both+=r[1];op.closeOther+=r[2]}});
+ const no=op.only+op.both+op.closeOther||1;
+ const PC={'Only AI visits':'#FFDE14','AI started and closed':'#EFFF04','AI started, another channel closed':'#CCCCCC','Another channel started, AI closed':'#43D5B0','AI in the middle':'#6F6F6F','Only organic search visits':'#FFDE14','Organic search started and closed':'#EFFF04','Organic search started, another channel closed':'#CCCCCC',_:['#3D3D3D']};
+ bars('jrPos',[['AI',[['Only AI visits',pos.only/np],['AI started and closed',pos.both/np],['AI started, another channel closed',pos.start/np],['Another channel started, AI closed',pos.close/np],['AI in the middle',pos.mid/np]]],['Organic search',[['Only organic search visits',op.only/no],['Organic search started and closed',op.both/no],['Organic search started, another channel closed',op.closeOther/no]]]],PC);
+ $('jrPos').insertAdjacentHTML('beforeend',`<div class="lg">${[['Only AI visits','#FFDE14'],['Started and closed','#EFFF04'],['Started, another channel closed','#CCCCCC'],['Another channel started, AI closed','#43D5B0'],['In the middle','#6F6F6F']].map(([l,c])=>`<span><i style="background:${c}"></i>${l}</span>`).join('')}</div>`);
+ const ba=(o,lead)=>{const t=Object.values(o).reduce((a,b)=>a+b,0)||1;return Object.entries(o).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[k==='buy'?'Bought in that visit':(k==='start'?'Nothing (AI came first)':SEGN[k]||k),v/t])};
+ const BC=Object.assign({},...Object.entries(SEGN).map(([k,v])=>({[v]:SEGC[k]})),{'Bought in that visit':'#43D5B0','Nothing (AI came first)':'#8A8B8C',_:['#2E2E2E']});
+ bars('jrBA',[['Before',ba(bef)],['After',ba(aft)]],BC);
+ $('jrBA').insertAdjacentHTML('beforeend',`<div class="lg">${[...new Set([...ba(bef),...ba(aft)].map(x=>x[0]))].map(l=>`<span><i style="background:${BC[l]||'#2E2E2E'}"></i>${l}</span>`).join('')}</div>`);
+ // KPIs
+ const r1=a=>a[2]/a[0],rd=a=>a[7]/(a[7]+a[8]+a[9]+a[10]||1),rn=a=>a[12]/a[0];
+ const kc=(l,v,s)=>`<div class="kpi"><div class="l">${l}</div><div class="v disp">${v}</div><div class="cmp" style="display:block">${s}</div></div>`;
+ const vsb=(f)=>`Organic search first: <b>${fmtP(f(O),0)}</b> · All orders: <b>${fmtP(f(T),0)}</b>`;
+ const pc=Ap[0]&&Tp[0]?chg(A[0]/T[0],Ap[0]/Tp[0]):null;
+ $('jrK').innerHTML=kc('Orders with an AI visit',fmtN(A[0]),`${fmtP(A[0]/T[0],2)} of all orders ${pc!=null?'· share '+chip(pc,'ses')+' vs the '+prevWs.length+' weeks before':''}`)
+  +kc('AI started the journey',fmtP((pos.only+pos.both+pos.start)/np,0),`AI was the first recorded visit. ${fmtP(pos.only/np,0)} of AI orders had no other channel in the path.`)
+  +kc('AI closed the sale',fmtP((pos.only+pos.both+pos.close)/np,0),`AI was the last visit before the order. AI was in the path but not last for ${fmtP((pos.start+pos.mid)/np,0)}.`)
+  +kc('Bought on the first visit',fmtP(r1(A),0),vsb(r1))
+  +kc('Bought within a day',fmtP(rd(A),0),vsb(rd))
+  +kc('New customers',fmtP(rn(A),0),vsb(rn));
+ const VB=['1 visit','2','3-4','5-9','10+'],DB=['Same or next day','2-7 days','8-30 days'];
+ const dist=(a,from,n)=>{const s=a.slice(from,from+n);const t=s.reduce((x,y)=>x+y,0)||1;return s.map(x=>x/t*100)};
+ const cs=[['Orders with an AI visit',A,'#FFDE14'],['Started from organic search',O,'#CCCCCC'],['All orders',T,'#43D5B0']];
+ chart('cJrV',{type:'bar',data:{labels:VB,datasets:cs.map(([l,a,c])=>({label:l,data:dist(a,2,5),backgroundColor:c}))},options:{scales:{x:{grid:{display:false}},y:{grid,ticks:{callback:v=>v+'%'}}}}});
+ chart('cJrD',{type:'bar',data:{labels:DB,datasets:cs.map(([l,a,c])=>({label:l,data:dist(a,7,3),backgroundColor:c}))},options:{scales:{x:{grid:{display:false}},y:{grid,ticks:{callback:v=>v+'%'}}}}});
+ const pth=k=>k.split('>').map(s=>SEGN[s]||s).join(' → ');
+ const apat={};rows.forEach(r=>{const st=r[5]?r[5].split('>').map(x=>x.split(':')[0]):[];const c=[];st.forEach(s=>{if(c[c.length-1]!==s)c.push(s)});if(!c.length)return;
+  let k=c.join('>');if(c.length>5){const a=c.indexOf('ai'),b=c.lastIndexOf('ai');const s0=Math.max(0,a-1),s1=Math.min(c.length,Math.max(b+2,s0+3));k=(s0>0?'…>':'')+c.slice(s0,s1).join('>')+(s1<c.length?'>…':'')}apat[k]=(apat[k]||0)+1});
+ const ptbl=(o,n)=>{const t=Object.values(o).reduce((a,b)=>a+b,0)||1;return '<thead><tr><th style="text-align:left">Journey</th><th>Orders</th><th>Share</th></tr></thead><tbody>'+Object.entries(o).sort((a,b)=>b[1]-a[1]).slice(0,n).map(([k,v])=>`<tr><td style="text-align:left;white-space:normal">${pth(k)}</td><td>${fmtN(v)}</td><td>${fmtP(v/t)}</td></tr>`).join('')+'</tbody>'};
+ $('jrPathAI').innerHTML=ptbl(apat,15);$('jrPathOrg').innerHTML=ptbl(opat,15);
+ }
+ // ---------- on site over time ----------
+ pills('osP',[['w','Weekly'],['m','Monthly']],'gran',ds);$('osL').textContent=S.gran==='m'?'By retail month.':'Weekly, 4-week rolling, because weekly AI volumes are small.';
+ const OS=[['dur','Time on site',v=>v,fmtS],['pps','Pages per session',v=>v,fmtF],['pdp','Product views per session',v=>v,fmtF],['bnc','Bounce rate',v=>v*100,v=>v.toFixed(0)+'%'],['atc','Add to cart rate',v=>v*100,v=>v.toFixed(1)+'%'],['chk','Reached checkout',v=>v*100,v=>v.toFixed(1)+'%']];
+ const osS=[['ai','AI assistants','#FFDE14',3],['organic_search','Organic search','#CCCCCC',1.5],['site','Whole site','#43D5B0',1.5]];
+ if(!$('osGrid').children.length)$('osGrid').innerHTML=OS.map(([m,l])=>`<div class="panel"><h3 class="disp">${l}</h3><div class="sub" id="os_${m}_s"></div><div class="ch sm"><canvas id="os_${m}"></canvas></div></div>`).join('');
+ OS.forEach(([m,l,tr,f])=>{
+  const ser=g=>S.gran==='m'?MW.map(w=>w.length?tr(MET[m].c(sumW(g,w))):null):D.weeks.map((_,j)=>j<3?null:tr(MET[m].c(sumW(g,periodIdx(j,4)))));
+  const labels=S.gran==='m'?D.rmonths.map(x=>x.l):lbl;
+  chart('os_'+m,{type:'line',data:{labels,datasets:osS.map(([g,n,c,w])=>({label:n,data:ser(g),borderColor:c,backgroundColor:c,pointRadius:S.gran==='m'?2:0,borderWidth:w,tension:.25}))},options:{plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:6,maxRotation:0}},y:{grid,ticks:{callback:v=>m==='dur'?fmtS(v):(['bnc','atc','chk'].includes(m)?v+'%':v.toFixed(1))}}}}});
+  const cur=MET[m].c(sumW('ai',p.cur)),org=MET[m].c(sumW('organic_search',p.cur)),ly=MET[m].c(sumW('ai',p.ly));
+  $('os_'+m+'_s').innerHTML=`<span style="color:#FFDE14">■</span> AI ${f(tr(cur))} · <span style="color:#CCC">■</span> Organic ${f(tr(org))} · <span style="color:#43D5B0">■</span> Site ${f(tr(MET[m].c(sumW('site',p.cur))))} · AI vs last year ${chip(chg(cur,ly),m)}`;
+ });
+ // ---------- entry points ----------
+ const ET=['Product','Homepage','Collection','Search','Checkout','Other'];const etOf=t=>ET.includes(t)?t:'Other';
+ const ltSum=(c,idxs)=>{const o={};for(const[t,arr] of Object.entries(D.lt[c]||{})){const k=etOf(t);idxs.forEach(i=>{const r=arr[i];if(r){o[k]=o[k]||[0,0,0,0,0,0,0];r.forEach((v,j)=>o[k][j]+=v)}})}return o};
+ const ECOL={Product:'#FFDE14',Homepage:'#CCCCCC',Collection:'#43D5B0',Search:'#EFFF04',Checkout:'#FF5A4F',Other:'#3D3D3D'};
+ const mm=D.rmonths.map((m,i)=>i).filter(i=>MW[i].length&&D.rmonths[i].k>=D.rmonths[Math.max(0,D.rmonths.length-15)].k);
+ chart('cEnt',{type:'bar',data:{labels:mm.map(i=>D.rmonths[i].l),datasets:ET.map(t=>({label:t==='Search'?'Search results':t,backgroundColor:ECOL[t],data:mm.map(i=>{const o=ltSum('ai',MW[i]);const tot=Object.values(o).reduce((a,b)=>a+b[0],0)||1;return (o[t]?o[t][0]:0)/tot*100})}))},options:{scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,max:100,grid,ticks:{callback:v=>v+'%'}}}}});
+ const ea=ltSum('ai',p.cur),eo=ltSum('org',p.cur);const ta=Object.values(ea).reduce((a,b)=>a+b[0],0)||1,to=Object.values(eo).reduce((a,b)=>a+b[0],0)||1;
+ $('enTbl').innerHTML='<thead><tr><th style="text-align:left">Lands on</th><th>AI share</th><th>Organic share</th><th>AI time</th><th>AI pages</th><th>AI ATC</th><th>AI CVR</th><th>Organic CVR</th></tr></thead><tbody>'+ET.map(t=>{const a=ea[t]||[0,0,0,0,0,0,0],o=eo[t]||[0,0,0,0,0,0,0];return `<tr><td style="text-align:left">${t==='Search'?'Search results':t}</td><td>${fmtP(a[0]/ta)}</td><td>${fmtP(o[0]/to)}</td><td>${a[0]?fmtS(a[4]/a[0]):'–'}</td><td>${a[0]?fmtF(a[5]/a[0]):'–'}</td><td>${a[0]?fmtP(a[1]/a[0]):'–'}</td><td>${a[0]?fmtP(a[3]/a[0],2):'–'}</td><td>${o[0]?fmtP(o[3]/o[0],2):'–'}</td></tr>`}).join('')+'</tbody>';
+ const sh=t=>(ea[t]?ea[t][0]:0)/ta,sho=t=>(eo[t]?eo[t][0]:0)/to;
+ $('enNote').innerHTML=`${perLabel()}. ${fmtP(sh('Product'),0)} of AI visits land straight on a product page (organic search ${fmtP(sho('Product'),0)}). ${fmtP(sh('Search'),1)} land on a search results page, which happens when an assistant links to a jdsports.ca search, and ${fmtP(sh('Checkout'),1)} land directly in checkout (organic ${fmtP(sho('Checkout'),1)}). Shopify's on-site search report is not tied to traffic source, so searches made after arriving cannot be split by channel; landing pages, pages per session and the journey paths above are the closest read on whether AI visitors browse or go straight to buy.`;
+ // ---------- discovery vs close ----------
  chart('cAttr',{type:'line',data:{labels:lbl,datasets:[{label:'First click',data:roll(D.weekly.ai.map(r=>r[ix.fc_net])),borderColor:'#FFDE14',pointRadius:0,borderWidth:2},{label:'Last non-direct click',data:roll(D.weekly.ai.map(r=>r[ix.ln_net])),borderColor:'#43D5B0',pointRadius:0,borderWidth:2}]},options:{scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid,ticks:{callback:v=>'$'+(v/1000).toFixed(1)+'k'}}}}});
  const nn=(g)=>D.weeks.map((_,i)=>{if(i<3)return null;const a=sumW(g,periodIdx(i,4));return a[ix.fc_ord]?a[ix.fc_ord_n]/a[ix.fc_ord]*100:null});
  chart('cNew',{type:'line',data:{labels:lbl,datasets:[{label:'AI',data:nn('ai'),borderColor:'#FFDE14',pointRadius:0,borderWidth:3},{label:'Organic search',data:nn('organic_search'),borderColor:'#CCCCCC',pointRadius:0,borderWidth:1.5},{label:'Whole site',data:nn('site'),borderColor:'#43D5B0',pointRadius:0,borderWidth:1.5}]},options:{scales:{x:{grid:{display:false},ticks:{maxTicksLimit:10}},y:{grid,min:0,max:100,ticks:{callback:v=>v+'%'}}}}});

@@ -4,6 +4,8 @@ raw.json comes from the Shopify pull (see RUNBOOK.md)."""
 import json, sys, collections, datetime as dt
 
 raw, sv, mk, tpl, out = sys.argv[1:6]
+LTF = sys.argv[6] if len(sys.argv) > 6 else 'data/landing_types.json'
+JRF = sys.argv[7] if len(sys.argv) > 7 else 'data/journeys.json'
 d = json.load(open(raw)); K = d['keys']
 SV = json.load(open(sv)); MK = json.load(open(mk))
 AI_SEGS = ['ai_chatgpt','ai_perplexity','ai_copilot','ai_gemini','ai_claude','ai_other']
@@ -73,6 +75,41 @@ P = dict(
   lp=d['lp'], prod=[p for p in d['prod'] if p[1] and p[1] != 'null'],
   searchable=SV, market=MK)
 
+# ---------- landing types by week (AI / organic search / all) ----------
+LTD = json.load(open(LTF))
+wi = {w: i for i, w in enumerate(weeks)}
+lt = {}
+for c, rows in LTD.items():
+    o = {}
+    for day, t, *v in rows:
+        if day > LW_END: continue
+        i = wi.get(wk(day))
+        if i is None: continue
+        arr = o.setdefault(t or 'Other', [None]*len(weeks))
+        arr[i] = [a+b for a, b in zip(arr[i] or [0]*7, v)]
+    lt[c] = o
+P['lt'] = lt
+# ---------- order journeys ----------
+JR = json.load(open(JRF))
+w0 = wi[min(w for w in wi if w >= JR['since'])]
+VB = ['1','2','3-4','5-9','10+']; DB = ['0-1','2-7','8-30','31+','na']
+jc = {c: [[0]*13 for _ in weeks[w0:]] for c in ('ai','org','all')}
+for w, f_, l_, anyai, vb, db, nr, n, val in JR['agg']:
+    if w not in wi or wi[w] < w0: continue
+    cs = ['all'] + (['ai'] if anyai == '1' else []) + (['org'] if f_ == 'organic_search' else [])
+    for c in cs:
+        a = jc[c][wi[w]-w0]
+        a[0] += n; a[1] += val; a[2+VB.index(vb)] += n; a[7+DB.index(db)] += n
+        if nr == 'n': a[12] += n
+orgp = collections.Counter(); orgpos = [[0, 0, 0] for _ in weeks[w0:]]
+for coh, w, p, n in JR['pat']:
+    if coh == 'org' and w in wi and wi[w] >= w0:
+        orgp[(wi[w], p)] += n; st = p.split('>')
+        orgpos[wi[w]-w0][0 if len(st) == 1 else (1 if st[-1] == 'organic_search' else 2)] += n
+P['jr'] = dict(w0=w0, since=JR['since'], c=jc, orgPos=orgpos,
+  ai=[[wi[wk(r[0])]] + r[1:] for r in JR['ai'] if wk(r[0]) in wi and wi[wk(r[0])] >= w0],
+  org=[[i, p, n] for (i, p), n in orgp.items() if n >= 2])
+
 # ---------- insights (rule-based, recomputed every build) ----------
 idx = {k: i for i, k in enumerate(K)}
 def agg(g, ws):
@@ -110,10 +147,23 @@ ins.append(dict(h='They arrive decided',
 ins.append(dict(h='A new-customer channel',
   t=f"{pct(m(aiT,'new'))} of AI orders this year (last non-direct click) came from new customers, vs {pct(m(orT,'new'))} for organic search and {pct(m(siT,'new'))} for the site. "
     f"Revenue per session (last non-direct) is ${m(aiT,'rps'):.2f} (organic ${m(orT,'rps'):.2f}, paid search ${m(paT,'rps'):.2f})."))
-lnr = m(aiT, 'ln')/m(aiT, 'net') if m(aiT, 'net') else 0
-ins.append(dict(h='Discovery and close',
-  t=f"Year to date AI earns ${f(m(aiT,'net'))} on first click and ${f(m(aiT,'ln'))} on last non-direct click ({lnr*100:.0f}% of first click). "
-    + ("AI more often closes the sale than starts it, so last-click views do not undercount it." if lnr >= 1 else "AI starts more journeys than it closes, so last-click reporting undercounts it.")))
+# journeys: last 13 complete weeks of orders
+jw = [i for i in range(max(w0, len(weeks)-13), len(weeks))]
+def jsum(c): return [sum(jc[c][i-w0][k] for i in jw) for k in range(13)]
+JA, JO, JT = jsum('ai'), jsum('org'), jsum('all')
+pos = collections.Counter(); bef = collections.Counter(); aft = collections.Counter()
+for r in P['jr']['ai']:
+    if r[0] not in jw or not r[5]: continue
+    st = [x.split(':')[0] for x in r[5].split('>')]; ai = [i for i, x in enumerate(st) if x == 'ai']
+    i0, i1, n_ = ai[0], ai[-1], len(st)
+    pos['only' if len(ai) == n_ else ('first' if i0 == 0 else ('last' if i1 == n_-1 else 'mid'))] += 1
+    aft[st[i1+1] if i1 < n_-1 else 'buy'] += 1; bef[st[i0-1] if i0 > 0 else 'start'] += 1
+npos = sum(pos.values()) or 1
+ps_touch = (bef['paid_search'] + aft['paid_search'])
+ins.append(dict(h='Half the journey, not all of it',
+  t=f"Over the last 13 weeks {JA[0]:,} orders ({JA[0]/JT[0]*100:.2f}%) had at least one AI visit in the path, about {JA[0]/max(1,m(a13,'ord')):.1f}x the orders AI gets on first click. "
+    f"Only {pos['only']/npos*100:.0f}% were AI-only journeys. AI came first in {(bef['start'])/npos*100:.0f}% and was the last visit in {aft['buy']/npos*100:.0f}%. "
+    f"Paid search sits right before or after the AI visit in {ps_touch/npos*100:.0f}% of these orders, so paid search is picking up credit for some AI-influenced demand."))
 r7 = SV['rank']['7d']; jd = [x for x in r7 if x[0] == 'JD Sports'][0]; top = r7[0]
 ins.append(dict(h='Visibility in AI answers',
   t=f"Searchable puts JD's visibility at {jd[1]}% across tracked prompts in Canada last week ({jd[5]:+} pts), #{[x[0] for x in r7].index('JD Sports')+1} behind {top[0]} at {top[1]}%, with average position {jd[3]} vs {top[3]} and the lowest sentiment in the top 8 ({jd[4]})."))
